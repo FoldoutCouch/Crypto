@@ -11,15 +11,16 @@ public class Decrypt {
 	
 	public static void main(String[] args) {
 
-		//FirstCode.parse(cipher_ex1);
-		//FirstCode.parse(cipher_post);
-		//FirstCode.parse(cipher_final);
+		//FirstCodeword.parse(cipher_ex1);
+		//FirstCodeword.parse(cipher_post);
+		//FirstCodeword.parse(cipher_final);
 		for(int i=4; i< 7; ++i){
-			System.out.println("Second keyword length: "+i+", I.C. : "+ SecondCodeword.calculatePrintIndexOfCoinc(cipher_final, i) );
+			System.out.println("Second keyword length: "+i+", I.C. : "+ SecondCodeword.calculatePrintIOC(cipher_final, i) );
 		}
 		
-		//SecondCode.printAlphabetFreqs(cipher_final, 4);
-		SecondCodeword.alignAlphabets(cipher_final, 4);
+		//SecondCodeword.printAlphabetFreqs(cipher_final, 4);
+		int[] bestOffsets = SecondCodeword.alignAlphabets(cipher_final, 4);
+		SecondCodeword.printAlignedAlphabets(cipher_final, 4, bestOffsets);
 	}
 
 }

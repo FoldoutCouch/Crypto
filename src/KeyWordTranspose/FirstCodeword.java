@@ -17,7 +17,7 @@ public class FirstCodeword {
 		
 		int[] lettersArray = parseLetterFreq(cipher);
 		
-		printLetters(lettersArray);
+		printLetters(lettersArray, 0);
 
 	}
 
@@ -52,13 +52,13 @@ public class FirstCodeword {
 	/**
 	 * Print the letters in "tick" format.
 	 */
-	static void printLetters(int[] lettersArray) {
+	static void printLetters(int[] lettersArray, int offset) {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 26; ++i) {
-			sb.append(lettersArray[i]+"\t");
-			sb.append((char) (i + 'A') + ": ");
-			for (int x = 0; x < lettersArray[i]; ++x) {
+			sb.append(lettersArray[(i+offset)%26]+"\t");
+			sb.append((char) ((i+offset)%26 + 'A') + ": ");
+			for (int x = 0; x < lettersArray[(i+offset)%26]; ++x) {
 				sb.append("|");
 			}
 			sb.append("\n");
