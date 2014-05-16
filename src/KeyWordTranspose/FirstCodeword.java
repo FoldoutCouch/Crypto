@@ -5,9 +5,16 @@ import java.util.TreeMap;
 
 public class FirstCodeword {
 	
-	private static SortedMap<String, Integer> digraphMap = new TreeMap<String, Integer>();
-	private static SortedMap<String, Integer> trigraphMap = new TreeMap<String, Integer>();
-
+	private int[] histogram;
+	private SortedMap<String, Integer> digraphMap;
+	private SortedMap<String, Integer> trigraphMap;
+	
+	public FirstCodeword(String cipher){
+		histogram = parseLetterFreq(cipher);
+		digraphMap = parseDigraphs(cipher);
+		trigraphMap = parseTrigraphs(cipher);
+	}
+	
 	/**
 	 * Runs this class. Tries to help in finding the first key word.
 	 * 
@@ -17,7 +24,7 @@ public class FirstCodeword {
 		
 		int[] lettersArray = parseLetterFreq(cipher);
 		
-		printLetters(lettersArray, 0);
+		printHistogram(lettersArray, 0);
 
 	}
 
@@ -52,7 +59,7 @@ public class FirstCodeword {
 	/**
 	 * Print the letters in "tick" format.
 	 */
-	static void printLetters(int[] lettersArray, int offset) {
+	static void printHistogram(int[] lettersArray, int offset) {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 26; ++i) {
@@ -69,9 +76,20 @@ public class FirstCodeword {
 	/**
 	 * 
 	 * @param cipher
+	 * @return 
 	 */
-	private static void parseDigraphs(String cipher) {
-		// TODO Auto-generated method stub
+	private SortedMap<String, Integer> parseDigraphs(String cipher) {
+		return digraphMap;
+		
+	}
+	
+	/**
+	 * 
+	 * @param cipher
+	 * @return
+	 */
+	private SortedMap<String, Integer> parseTrigraphs(String cipher) {
+		return digraphMap;
 
 	}
 

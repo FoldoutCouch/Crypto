@@ -22,13 +22,16 @@ public class SecondCodeword {
 	}
 
 	/**
-	 * Creates the histograms.
+	 * Creates the histograms for the cipher text.
 	 * 
 	 * @param cipher
+	 *            String containing A to Z.
 	 * @param numAlphabets
-	 * @return
+	 *            Number of alphabets in the cipher.
+	 * @return The histograms as int[numAlphabets][26]. Each int[i][j] is the
+	 *         frequency of letter ('A'+j) in the ith alphabet.
 	 */
-	private static int[][] createHistogram(String cipher, int numAlphabets) {
+	static int[][] createHistogram(String cipher, int numAlphabets) {
 		int[][] alphaFreqs = new int[numAlphabets][26];
 
 		int N = cipher.length() / numAlphabets;
@@ -37,7 +40,7 @@ public class SecondCodeword {
 		for (int alpha = 0; alpha < numAlphabets; ++alpha) {
 
 			// inner loop progesses within the current alphabet
-			for (int i = alpha; i < (cipher.length() - 1); i += numAlphabets) {
+			for (int i = alpha; i < cipher.length(); i += numAlphabets) {
 				char curr = cipher.charAt(i);
 				alphaFreqs[alpha][curr - 'A']++;
 			}
@@ -92,7 +95,7 @@ public class SecondCodeword {
 			// build a new string to call FirstCode.parse
 			StringBuilder sb = new StringBuilder();
 
-			for (int curr = alpha; curr < (cipher.length() - 1); curr += 4) {
+			for (int curr = alpha; curr < cipher.length(); curr += 4) {
 				sb.append(cipher.charAt(curr));
 			}
 			System.out.println("Printing Alphabet #" + alpha);
@@ -111,12 +114,17 @@ public class SecondCodeword {
 	 *            The length of the second keyword is also the number of
 	 *            alphabets that need to be collapsed. Breaks if numAlphabets is
 	 *            less than 2.
+	 * @param printHistograms
+	 *            True if you want to print the histogram for each alphabet.
+	 *            Only useful for manually double checking that this performed
+	 *            correctly.
 	 * @return int[] An int[numAlphabets], int[i] is the rotation amount of the
 	 *         ith alphabet relative to the 0th alphabet. int[0] is always 0.
 	 *         ex) when 1st: ABCD lines up with 2nd: WXYZ then int[0]=0,
-	 *         int[i]=4
+	 *         int[2]=4
 	 */
-	public static int[] alignAlphabets(String cipher, int numAlphabets) {
+	public static int[] alignAlphabets(String cipher, int numAlphabets,
+			boolean printHistograms) {
 
 		System.out.println("Aligning Alphabets...");
 		int[][] alphaFreqs = createHistogram(cipher, numAlphabets);
@@ -179,14 +187,30 @@ public class SecondCodeword {
 		}
 
 		System.out.println("Done aligning Alphabets...");
-
-		for (int alpha = 0; alpha < numAlphabets; ++alpha) {
-			System.out.println("Printing Aligned Histogram #" + alpha);
-			FirstCodeword.printLetters(alphaFreqs[alpha], bestOffsets[alpha]);
+		if (printHistograms) {
+			for (int alpha = 0; alpha < numAlphabets; ++alpha) {
+				System.out.println("Printing Aligned Histogram #" + alpha);
+				FirstCodeword.printHistogram(alphaFreqs[alpha],
+						bestOffsets[alpha]);
+			}
 		}
 		return bestOffsets;
 	}
 
+	/**
+	 * Calculates the Index of Coincidence (IOC) of the histogram created by
+	 * collapsing the alphaFreqs with the rotateOffsets.
+	 * 
+	 * @param cipherLength
+	 *            The length of the cipher.
+	 * @param alphaFreqs
+	 *            The histogram(s) created by createHistogram().
+	 * @param numAlphabets
+	 *            The number of alphabets.
+	 * @param rotateqOffsets
+	 *            The offset alignment of each alphabet, in range 0-25.
+	 * @return
+	 */
 	private static double rotate_collapse_calcIOC(int cipherLength,
 			int[][] alphaFreqs, int numAlphabets, int[] rotateOffsets) {
 
@@ -214,23 +238,73 @@ public class SecondCodeword {
 	 * Prints the alphabets aligned.
 	 * 
 	 * @param cipher
+	 *            The cipher text. Bad behavior if cipher contains any
+	 *            characters except 'A' to 'Z' inclusive.
 	 * @param numAlphabets
+	 *            The number of alphabets.
 	 * @param bestOffsets
+	 *            The offset alignment of each alphabet, in range 0-25.
 	 */
 	public static void printAlignedAlphabets(String cipher, int numAlphabets,
 			int[] offsets) {
 		System.out.println("Printing Aligning Alphabets...");
 		int[][] alphaFreqs = createHistogram(cipher, numAlphabets);
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 26; ++i) {
-			for(int alpha = numAlphabets-1; alpha > -1; --alpha){
-				sb.append((char) ((i+offsets[alpha])%26 + 'A'));
+			for (int alpha = 0; alpha < numAlphabets; ++alpha) {
+				sb.append((char) ((i + offsets[alpha]) % 26 + 'A'));
 			}
 			sb.append("\n");
 		}
-		
+
 		System.out.print(sb);
+
+	}
+
+	/**
+	 * Creates the histogram by collapsing the alphaFreqs with the
+	 * rotateOffsets.
+	 * 
+	 * This is used to create the histogram of the Code Alphabet.
+	 * 
+	 * @param cipherLength
+	 *            The length of the cipher.
+	 * @param alphaFreqs
+	 *            The histogram(s) created by createHistogram().
+	 * @param numAlphabets
+	 *            The number of alphabets.
+	 * @param offsets
+	 *            The offset alignment of each alphabet, in range 0-25.
+	 * @return int[] the collapsed histogram, histogram of the Code Alphabet.
+	 */
+	static int[] collapseHistograms(int[][] alphaFreqs, int numAlphabets,
+			int[] offsets) {
+		int[] histogram = new int[26];
+		for (int i = 0; i < 26; ++i) {
+			for (int alpha = 0; alpha < numAlphabets; ++alpha) {
+				histogram[i] += alphaFreqs[alpha][(i + offsets[alpha]) % 26];
+			}
+		}
+		return histogram;
+	}
+
+	static String translateToSingleKeyTranspose(String cipher,
+			int numAlphabets, int[] offsets) {
+		// string builder
+		StringBuilder newCipher = new StringBuilder(300);
 		
+		int N = cipher.length();
+		int currChar;
+		// for each char in the cipher
+		for (int i = 0; i < N; ++i) {
+			currChar = cipher.charAt(i)-offsets[i%numAlphabets];
+			if('A' > currChar){
+				currChar+=('Z'-'A');
+			}
+			newCipher.append( (char)currChar );
+		}
+		return newCipher.toString();
+
 	}
 }
