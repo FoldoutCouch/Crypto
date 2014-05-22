@@ -252,6 +252,7 @@ public class SecondCodeword {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 26; ++i) {
+			sb.append((char)(i+'A') + " : ");
 			for (int alpha = 0; alpha < numAlphabets; ++alpha) {
 				sb.append((char) ((i + offsets[alpha]) % 26 + 'A'));
 			}
@@ -300,7 +301,7 @@ public class SecondCodeword {
 		for (int i = 0; i < N; ++i) {
 			currChar = cipher.charAt(i)-offsets[i%numAlphabets];
 			if('A' > currChar){
-				currChar+=('Z'-'A');
+				currChar+=('Z'-'A'+1);
 			}
 			newCipher.append( (char)currChar );
 		}
